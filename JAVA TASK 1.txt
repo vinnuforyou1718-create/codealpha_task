@@ -1,0 +1,204 @@
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+class Student {
+    String name;
+    int rollNo;
+    double javaMarks;
+    double dbmsMarks;
+    double mathMarks;
+
+    Student(String name, int rollNo, double javaMarks,
+            double dbmsMarks, double mathMarks) {
+        this.name = name;
+        this.rollNo = rollNo;
+        this.javaMarks = javaMarks;
+        this.dbmsMarks = dbmsMarks;
+        this.mathMarks = mathMarks;
+    }
+
+    double getTotal() {
+        return javaMarks + dbmsMarks + mathMarks;
+    }
+
+    double getAverage() {
+        return getTotal() / 3.0;
+    }
+
+    String getGrade() {
+        double avg = getAverage();
+
+        if (avg >= 90) return "A+";
+        else if (avg >= 80) return "A";
+        else if (avg >= 70) return "B";
+        else if (avg >= 60) return "C";
+        else if (avg >= 50) return "D";
+        else return "F";
+    }
+
+    String getResult() {
+        if (javaMarks < 35 || dbmsMarks < 35
+                || mathMarks < 35) {
+            return "FAIL";
+        }
+        return "PASS";
+    }
+
+    void display() {
+        System.out.printf(
+            "%-10d %-18s %7.1f %7.1f %7.1f %8.1f %9.2f %-6s %-6s%n",
+            rollNo, name, javaMarks, dbmsMarks, mathMarks,
+            getTotal(), getAverage(), getGrade(), getResult()
+        );
+    }
+}
+
+public class StudentGradeTracker {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        ArrayList<Student> students = new ArrayList<>();
+
+        System.out.println("==============================================");
+        System.out.println("       COLLEGE STUDENT GRADE TRACKER");
+        System.out.println("==============================================");
+
+        int n;
+
+        while (true) {
+            System.out.print("Enter number of students: ");
+            if (sc.hasNextInt()) {
+                n = sc.nextInt();
+                sc.nextLine();
+                if (n > 0) break;
+            } else {
+                sc.nextLine();
+            }
+            System.out.println("Enter a valid positive number.");
+        }
+
+        for (int i = 0; i < n; i++) {
+            System.out.println("\nEnter details for Student " + (i + 1));
+
+            System.out.print("Roll Number: ");
+            int rollNo = sc.nextInt();
+            sc.nextLine();
+
+            System.out.print("Student Name: ");
+            String name = sc.nextLine();
+
+            double[] marks = new double[3];
+            String[] subjects = {"Java", "DBMS", "Mathematics"};
+
+            for (int j = 0; j < 3; j++) {
+                while (true) {
+                    System.out.print(subjects[j] + " Marks (0-100): ");
+
+                    if (sc.hasNextDouble()) {
+                        marks[j] = sc.nextDouble();
+                        sc.nextLine();
+
+                        if (marks[j] >= 0 && marks[j] <= 100) {
+                            break;
+                        }
+                    } else {
+                        sc.nextLine();
+                    }
+
+                    System.out.println("Invalid marks. Enter 0 to 100.");
+                }
+            }
+
+            students.add(new Student(
+                name, rollNo, marks[0], marks[1], marks[2]
+            ));
+        }
+
+        double totalAverage = 0;
+        double highest = -1;
+        double lowest = 101;
+        Student topper = null;
+
+        System.out.println("\n\n================ STUDENT REPORT ================");
+        System.out.printf(
+            "%-10s %-18s %7s %7s %7s %8s %9s %-6s %-6s%n",
+            "Roll No", "Name", "Java", "DBMS", "Math",
+            "Total", "Average", "Grade", "Result"
+        );
+        System.out.println(
+            "--------------------------------------------------------------------------"
+        );
+
+        for (Student s : students) {
+            s.display();
+            totalAverage += s.getAverage();
+
+            if (s.getAverage() > highest) {
+                highest = s.getAverage();
+                topper = s;
+            }
+
+            if (s.getAverage() < lowest) {
+                lowest = s.getAverage();
+            }
+        }
+
+        System.out.println(
+            "--------------------------------------------------------------------------"
+        );
+
+        System.out.printf("Class Average : %.2f%n",
+                          totalAverage / students.size());
+        System.out.printf("Highest Average: %.2f%n", highest);
+        System.out.printf("Lowest Average : %.2f%n", lowest);
+
+        if (topper != null) {
+            System.out.println("Class Topper  : " + topper.name
+                               + " (Roll No: " + topper.rollNo + ")");
+        }
+
+        sc.close();
+    }
+}
+
+
+OUTPUT:
+==============================================
+       COLLEGE STUDENT GRADE TRACKER
+==============================================
+Enter number of students: 3
+
+Enter details for Student 1
+Roll Number: 101
+Student Name: Ravi Kumar
+Java Marks (0-100): 85
+DBMS Marks (0-100): 78
+Mathematics Marks (0-100): 92
+
+Enter details for Student 2
+Roll Number: 102
+Student Name: Priya Sharma
+Java Marks (0-100): 95
+DBMS Marks (0-100): 91
+Mathematics Marks (0-100): 89
+
+Enter details for Student 3
+Roll Number: 103
+Student Name: Rahul Reddy
+Java Marks (0-100): 62
+DBMS Marks (0-100): 74
+Mathematics Marks (0-100): 68
+
+
+================ STUDENT REPORT ================
+Roll No    Name                Java    DBMS    Math    Total   Average Grade  Result
+--------------------------------------------------------------------------
+101        Ravi Kumar          85.0    78.0    92.0    255.0     85.00 A      PASS
+102        Priya Sharma        95.0    91.0    89.0    275.0     91.67 A+     PASS
+103        Rahul Reddy         62.0    74.0    68.0    204.0     68.00 C      PASS
+--------------------------------------------------------------------------
+Class Average : 81.56
+Highest Average: 91.67
+Lowest Average : 68.00
+Class Topper  : Priya Sharma (Roll No: 102)

@@ -1,0 +1,241 @@
+1.ROOM CLASS
+public class Room {
+    private int roomNumber;
+    private String category;
+    private double price;
+    private boolean available;
+
+    public Room(int roomNumber, String category, double price) {
+        this.roomNumber = roomNumber;
+        this.category = category;
+        this.price = price;
+        this.available = true;
+    }
+
+    // Getters and Setters
+}
+2.CUSTOMER CLASS
+public class Customer {
+    private int customerId;
+    private String name;
+    private String phone;
+
+    public Customer(int customerId, String name, String phone) {
+        this.customerId = customerId;
+        this.name = name;
+        this.phone = phone;
+    }
+
+    // Getters
+}
+3.RESERVATION CLASS
+import java.time.LocalDate;
+
+public class Reservation {
+
+    private int bookingId;
+    private Customer customer;
+    private Room room;
+    private LocalDate checkIn;
+    private LocalDate checkOut;
+    private String paymentStatus;
+
+    public Reservation(int bookingId, Customer customer,
+                       Room room,
+                       LocalDate checkIn,
+                       LocalDate checkOut) {
+
+        this.bookingId = bookingId;
+        this.customer = customer;
+        this.room = room;
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+        this.paymentStatus = "Paid";
+    }
+
+    // Getters
+}
+4.HOTEL CLASS
+import java.util.*;
+
+public class Hotel {
+
+    private List<Room> rooms = new ArrayList<>();
+    private List<Reservation> reservations = new ArrayList<>();
+
+    public void addRoom(Room room) {
+        rooms.add(room);
+    }
+
+    public void displayAvailableRooms() {
+
+        System.out.println("\nAvailable Rooms:");
+
+        for(Room room : rooms) {
+            if(room.isAvailable()) {
+                System.out.println(
+                    room.getRoomNumber() + " | " +
+                    room.getCategory() + " | ₹" +
+                    room.getPrice()
+                );
+            }
+        }
+    }
+
+    public Reservation bookRoom(
+            int bookingId,
+            Customer customer,
+            int roomNumber,
+            String checkIn,
+            String checkOut) {
+
+        for(Room room : rooms) {
+
+            if(room.getRoomNumber() == roomNumber
+                    && room.isAvailable()) {
+
+                room.setAvailable(false);
+
+                Reservation reservation =
+                        new Reservation(
+                                bookingId,
+                                customer,
+                                room,
+                                java.time.LocalDate.parse(checkIn),
+                                java.time.LocalDate.parse(checkOut)
+                        );
+
+                reservations.add(reservation);
+
+                return reservation;
+            }
+        }
+        return null;
+    }
+
+    public boolean cancelBooking(int bookingId) {
+
+        Iterator<Reservation> iterator =
+                reservations.iterator();
+
+        while(iterator.hasNext()) {
+
+            Reservation reservation = iterator.next();
+
+            if(reservation.getBookingId() == bookingId) {
+
+                reservation.getRoom()
+                        .setAvailable(true);
+
+                iterator.remove();
+
+                return true;
+            }
+        }
+        return false;
+    }
+}
+5.PAYMENT PAGE
+import java.util.*;
+
+public class Hotel {
+
+    private List<Room> rooms = new ArrayList<>();
+    private List<Reservation> reservations = new ArrayList<>();
+
+    public void addRoom(Room room) {
+        rooms.add(room);
+    }
+
+    public void displayAvailableRooms() {
+
+        System.out.println("\nAvailable Rooms:");
+
+        for(Room room : rooms) {
+            if(room.isAvailable()) {
+                System.out.println(
+                    room.getRoomNumber() + " | " +
+                    room.getCategory() + " | ₹" +
+                    room.getPrice()
+                );
+            }
+        }
+    }
+
+    public Reservation bookRoom(
+            int bookingId,
+            Customer customer,
+            int roomNumber,
+            String checkIn,
+            String checkOut) {
+
+        for(Room room : rooms) {
+
+            if(room.getRoomNumber() == roomNumber
+                    && room.isAvailable()) {
+
+                room.setAvailable(false);
+
+                Reservation reservation =
+                        new Reservation(
+                                bookingId,
+                                customer,
+                                room,
+                                java.time.LocalDate.parse(checkIn),
+                                java.time.LocalDate.parse(checkOut)
+                        );
+
+                reservations.add(reservation);
+
+                return reservation;
+            }
+        }
+        return null;
+    }
+
+    public boolean cancelBooking(int bookingId) {
+
+        Iterator<Reservation> iterator =
+                reservations.iterator();
+
+        while(iterator.hasNext()) {
+
+            Reservation reservation = iterator.next();
+
+            if(reservation.getBookingId() == bookingId) {
+
+                reservation.getRoom()
+                        .setAvailable(true);
+
+                iterator.remove();
+
+                return true;
+            }
+        }
+        return false;
+    }
+}
+5.FILE STORAGE
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class FileManager {
+
+    public static void saveBooking(
+            Reservation reservation)
+            throws IOException {
+
+        FileWriter writer =
+                new FileWriter(
+                    "bookings.txt",
+                    true);
+
+        writer.write(
+            reservation.getBookingId() + "," +
+            reservation.getCustomer().getName() + "," +
+            reservation.getRoom().getRoomNumber() + "\n"
+        );
+
+        writer.close();
+    }
+}

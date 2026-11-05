@@ -1,0 +1,196 @@
+import java.util.*;
+
+class Stock {
+    private String symbol;
+    private double price;
+
+    public Stock(String symbol, double price) {
+        this.symbol = symbol;
+        this.price = price;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+}
+
+class Transaction {
+    String type;
+    String symbol;
+    int quantity;
+    double price;
+
+    public Transaction(String type, String symbol, int quantity, double price) {
+        this.type = type;
+        this.symbol = symbol;
+        this.quantity = quantity;
+        this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return type + " " + quantity + " shares of " + symbol +
+               " @ $" + price;
+    }
+}
+
+class Portfolio {
+    private Map<String, Integer> holdings = new HashMap<>();
+    private List<Transaction> history = new ArrayList<>();
+
+    public void buyStock(Stock stock, int qty) {
+        holdings.put(stock.getSymbol(),
+                holdings.getOrDefault(stock.getSymbol(), 0) + qty);
+
+        history.add(new Transaction("BUY",
+                stock.getSymbol(), qty, stock.getPrice()));
+    }
+
+    public boolean sellStock(Stock stock, int qty) {
+        int current = holdings.getOrDefault(stock.getSymbol(), 0);
+
+        if (current < qty) {
+            return false;
+        }
+
+        holdings.put(stock.getSymbol(), current - qty);
+
+        history.add(new Transaction("SELL",
+                stock.getSymbol(), qty, stock.getPrice()));
+
+        return true;
+    }
+
+    public void showPortfolio(Map<String, Stock> market) {
+        double total = 0;
+
+        System.out.println("\nPortfolio:");
+
+        for (String symbol : holdings.keySet()) {
+            int qty = holdings.get(symbol);
+
+            if (qty > 0) {
+                double value = qty * market.get(symbol).getPrice();
+                total += value;
+
+                System.out.println(symbol +
+                        " | Shares: " + qty +
+                        " | Value: $" + value);
+            }
+        }
+
+        System.out.println("Total Portfolio Value = $" + total);
+    }
+
+    public void showHistory() {
+        System.out.println("\nTransaction History");
+        for (Transaction t : history) {
+            System.out.println(t);
+        }
+    }
+}
+
+class User {
+    private String name;
+    private double balance;
+    private Portfolio portfolio;
+
+    public User(String name, double balance) {
+        this.name = name;
+        this.balance = balance;
+        this.portfolio = new Portfolio();
+    }
+
+    public void buyStock(Stock stock, int qty) {
+        double cost = stock.getPrice() * qty;
+
+        if (balance >= cost) {
+            balance -= cost;
+            portfolio.buyStock(stock, qty);
+            System.out.println("Purchase successful.");
+        } else {
+            System.out.println("Insufficient balance.");
+        }
+    }
+
+    public void sellStock(Stock stock, int qty) {
+        if (portfolio.sellStock(stock, qty)) {
+            balance += stock.getPrice() * qty;
+            System.out.println("Sale successful.");
+        } else {
+            System.out.println("Not enough shares.");
+        }
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public Portfolio getPortfolio() {
+        return portfolio;
+    }
+}
+
+public class StockTradingPlatform {
+
+    public static void main(String[] args) {
+
+        Map<String, Stock> market = new HashMap<>();
+
+        market.put("AAPL", new Stock("AAPL", 180));
+        market.put("GOOG", new Stock("GOOG", 2500));
+        market.put("TSLA", new Stock("TSLA", 800));
+
+        User user = new User("John", 10000);
+
+        System.out.println("Market Stocks");
+
+        for (Stock s : market.values()) {
+            System.out.println(
+                    s.getSymbol() + " : $" + s.getPrice());
+        }
+
+        user.buyStock(market.get("AAPL"), 20);
+        user.buyStock(market.get("TSLA"), 5);
+
+        user.sellStock(market.get("AAPL"), 5);
+
+        System.out.println("\nCash Balance: $"
+                + user.getBalance());
+
+        user.getPortfolio().showPortfolio(market);
+
+        user.getPortfolio().showHistory();
+    }
+}
+
+
+OUTPUT:
+Market Stocks
+AAPL : $180
+GOOG : $2500
+TSLA : $800
+
+Purchase successful.
+Purchase successful.
+Sale successful.
+
+Cash Balance: $3300
+
+Portfolio:
+AAPL | Shares: 15 | Value: $2700
+TSLA | Shares: 5 | Value: $4000
+Total Portfolio Value = $6700
+
+Transaction History
+BUY 20 shares of AAPL @ $180
+BUY 5 shares of TSLA @ $800
+SELL 5 shares of AAPL @ $180
